@@ -3,7 +3,7 @@ package Class_For_JSON;
 import java.util.ArrayList;
 
 import SudokuSim.Cell;
-
+// commentaire
 public class OperationDemand {
 	String type;
 	int num;
@@ -14,7 +14,7 @@ public class OperationDemand {
 		this.num = num;
 		this.tab = new ArrayList<Cell>(cells);
 	}
-	//	There was a custom constructor defined for the class making it the default constructor. 
+	//	There was a custom constructor defined for the class making it the default constructor.
 	//	Introducing a dummy constructor has made the error to go away:
 	public OperationDemand() {
 	}
@@ -22,11 +22,11 @@ public class OperationDemand {
 	public String getType(){
 		return this.type;
 	}
-	
+
 	public int getNum(){
 		return this.num;
 	}
-	
+
 	public ArrayList<Cell> getTab(){
 		return this.tab;
 	}

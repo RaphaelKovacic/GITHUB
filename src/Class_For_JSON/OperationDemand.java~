@@ -4,8 +4,6 @@ import java.util.ArrayList;
 
 import SudokuSim.Cell;
 // commentaire
-
-// A moi de faire
 public class OperationDemand {
 	String type;
 	int num;

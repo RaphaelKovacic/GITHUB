@@ -3,15 +3,16 @@ package agents;
 import java.io.StringWriter;
 import java.util.ArrayList;
 
-import Dependences.AnalyseMessage;
 import SudokuSim.Cell;
 import SudokuSim.SudokuManager;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import Class_For_JSON.OperationDemand;
+import Class_For_JSON.OperationResult;
 import jade.core.AID;
 import jade.core.behaviours.CyclicBehaviour;
+import jade.core.behaviours.OneShotBehaviour;
 import jade.core.behaviours.SimpleBehaviour;
 import jade.core.behaviours.TickerBehaviour;
 import jade.domain.DFService;
@@ -80,25 +81,53 @@ public class SimulationAgent extends Agent{
 				AID receiver;
 				int num;
 				System.out.println("Agent "+myAgent.getLocalName()+": tick="+getTickCount());
-				for (int i = 0 ; i < 27 ; i++){
-					NameOfAna = "Analyse"+i;
-					receiver = myAgent.getAID(NameOfAna);
-					num = i%9;
-					if (i <9)
-						type = "Ligne";
-					else 
-						if(i < 18)
-							type = "Colonne";
-						else
-							type = "Carre";
-					sendMess_ToAna(myAgent,receiver,type,num);
-					id_conv++;
+				// Si on a recu les 27 subrscribe, on parrallélise les traitements.
+				System.out.println("nb_subs_recu :"+ nb_subs_recu);
+				if (nb_subs_recu == 27){
+					for (int i = 0 ; i < 27 ; i++){
+						NameOfAna = "Analyse"+i;
+						receiver = myAgent.getAID(NameOfAna);
+						num = i%9;
+						if (i <9)
+							type = "Ligne";
+						else 
+							if(i < 18)
+								type = "Colonne";
+							else
+								type = "Carre";
+						nb_subs_recu --;
+						sendMess_ToAna(myAgent,receiver,type,num);
+						id_conv++;
+					}
+					addBehaviour(new TraiteRepAnalyse());
 				}
-				addBehaviour(new TraiteRepAnalyse());
+				// Sinon il faudrait demander au DF de distribuer les messsages aléatoirement...
+				else{
+					
+				}
+
 			}
 		});
+		//Behaviour qui s'occupe de réceptionner les 'Subscribe' des agents d'analyses.
+		addBehaviour(new WaitBehaviour());
+		
 
+	} // fin Setup
 
+	class WaitBehaviour extends CyclicBehaviour{
+
+		@Override
+		public void action() {
+			// On attend la réception de message de type REQUEST
+			MessageTemplate mt = MessageTemplate.MatchPerformative(ACLMessage.SUBSCRIBE);
+			ACLMessage message = myAgent.receive(mt);
+			if (message != null){
+				nb_subs_recu++;
+				System.out.println("nb_subs_recu :"+ nb_subs_recu);
+			}else{
+				block();
+			}
+		}
 	}
 	
 	class TraiteRepAnalyse extends SimpleBehaviour{
@@ -132,11 +161,10 @@ public class SimulationAgent extends Agent{
 			// L'agent attend de recevoir des messages de type "INFORM"
 			MessageTemplate mt = MessageTemplate.MatchPerformative(ACLMessage.INFORM);
 			ACLMessage message = myAgent.receive(mt);
-			String mess = message.getContent();
 
 			if (message != null){
 				// On récupère le message et on met à jour notre copie de sudoku.
-				
+				String mess = message.getContent();
 				// On deserialise le message
 				ObjectMapper mapper = new ObjectMapper();
 				try {
@@ -149,17 +177,53 @@ public class SimulationAgent extends Agent{
 					System.out.println("EXCEPTION" + ex.getMessage());
 				}
 				
-				// On met a jour notre table;
+				// On met a jour notre table "copy";
 				manager.modifySudokuFromCells(type, num, Sudoku, cells);
 
-
+				
 				nb_rep++;
-				if (nb_rep == 27)
+				System.out.println("nb_rep :"+ nb_rep);
+				// Si jamais on a reçu les 27 messages :
+				if (nb_rep == 27){
+					nb_rep = 0;
 					endOf = true;
+					// On envoie notre Sudoku "Copy" à Env pour qu'il fasse la Maj du "Vrai" Sudoku.
+					myAgent.addBehaviour(new TraiteMajBehaviour());
+				}
+					
 			}else{
 				// Sinon on attend l'arrivé d'un message
 				block();		
 			}
+		}
+	}
+	
+	class TraiteMajBehaviour extends OneShotBehaviour{
+		
+		//Constructeur
+		public TraiteMajBehaviour() {
+			
+		}
+
+		public void action() {
+			// envoie du message de Maj.
+			ACLMessage message1 = new ACLMessage(ACLMessage.REQUEST);
+			message1.addReceiver(myAgent.getAID("Envi"));
+			
+			ObjectMapper mapper1 = new ObjectMapper();
+			StringWriter sw = new StringWriter();
+
+			OperationResult or = new OperationResult(Sudoku);
+			try {
+				mapper1.writeValue(sw, or);
+				String s1 = sw.toString();
+				message1.setContent(s1);
+				myAgent.send(message1);
+			}
+			catch(Exception ex) {
+				System.out.println(ex.getMessage());
+			}
+			
 		}
 	}
 
@@ -188,7 +252,7 @@ public class SimulationAgent extends Agent{
 			System.out.println("Sim a envoye (a "+ receiver.getLocalName() + ") :" + s1);
 		}
 		catch(Exception ex) {
-			System.out.println("Probleme serialisation lorsque Fact a envoye un mess...");
+			System.out.println(ex.getMessage());
 		}
 	}
 }

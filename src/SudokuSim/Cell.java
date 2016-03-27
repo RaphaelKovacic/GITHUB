@@ -4,11 +4,10 @@ import java.util.ArrayList;
 
 public class Cell {
 	private int value;
-	private ArrayList<Integer> l_possible;
+	private ArrayList<Integer> l_possible = new ArrayList<Integer>();
 	
 	public Cell(int valeur){
 		this.value = valeur;
-		this. l_possible = new ArrayList<Integer>();
 		if (value == 0){
 			this.l_possible.add(1);
 			this.l_possible.add(2);

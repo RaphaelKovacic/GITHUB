@@ -2,7 +2,6 @@ package launcher;
 import java.util.ArrayList;
 
 import SudokuSim.SudokuManager;
-import jade.core.Profile;
 import jade.core.ProfileImpl;
 import jade.core.Runtime;
 import jade.wrapper.AgentController;

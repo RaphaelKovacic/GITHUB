@@ -9,12 +9,12 @@ import SudokuSim.Cell;
 public class OperationDemand {
 	String type;
 	int num;
-	ArrayList<Cell> tab;
+	ArrayList<Cell> tab = new ArrayList<Cell>();
 
 	public OperationDemand(String type,int num, ArrayList<Cell> cells) {
 		this.type = type;
 		this.num = num;
-		this.tab = new ArrayList<Cell>(cells);
+		this.tab = cells;
 	}
 	//	There was a custom constructor defined for the class making it the default constructor.
 	//	Introducing a dummy constructor has made the error to go away:

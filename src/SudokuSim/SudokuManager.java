@@ -122,6 +122,14 @@ public class SudokuManager {
 		return Sudoku;
 		
 	}
+	
+	public boolean SudokuIsFinished(ArrayList<Cell> Sudoku){
+		// A FAIRE 
+		return true;
+	}
+	public void AfficheSudoku(ArrayList<Cell> Sudoku){
+		// A FAIRE 
+	}
 }
 
 

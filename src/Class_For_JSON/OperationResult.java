@@ -1,22 +1,21 @@
 package Class_For_JSON;
 
-public class OperationResult {
-	int value;
-	String comment;
-	
-	public OperationResult(int value, String comment) {
-		this.value = value;
-		this.comment = comment;
-	}
+import java.util.ArrayList;
 
-	public OperationResult(){
+import SudokuSim.Cell;
+
+public class OperationResult {
+	ArrayList<Cell> Sudoku = new ArrayList<Cell>();
+	
+	public OperationResult(ArrayList<Cell> S){
+		this.Sudoku = S;
 	}
 	
-	public int getValue(){
-		return this.value;
+	public OperationResult() {
+		
 	}
 	
-	public String getComment(){
-		return this.comment;
+	public ArrayList<Cell> getValue(){
+		return this.Sudoku;
 	}
 }

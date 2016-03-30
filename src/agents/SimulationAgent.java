@@ -41,12 +41,9 @@ public class SimulationAgent extends Agent{
 			Cell element = new Cell(SudokuInt.get(i));
 			Sudoku.add(i, element);
 		}
-		
+
 		manager.AfficheSudoku(Sudoku);
 
-
-		
-		
 //		int k,j;
 //		k=j=0;
 //		for(int i = 0; i < SudokuInt.size(); i++)

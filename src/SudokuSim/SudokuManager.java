@@ -141,6 +141,7 @@ public class SudokuManager {
 
 				
 				if (TempC.getValue() != 0){
+					System.out.println("On change la valeur de "+ TempT.getValue()+ "en"+ TempC.getValue());
 
 					//La valeur a été changée, on la remplace directement
 
@@ -187,7 +188,7 @@ public class SudokuManager {
 
 	public void setColonne(int num, ArrayList<Cell> Sudoku,ArrayList<Cell> Cells){
 		ArrayList<Cell> Temp = new ArrayList<Cell>();
-		Temp = getligne(num,Sudoku);
+		Temp = getcolonne(num,Sudoku);
 		Integer i = 0;
 		Cell TempC = new Cell();
 		Cell TempT = new Cell();
@@ -198,6 +199,7 @@ public class SudokuManager {
 				if (TempC.getValue() != 0){
 
 					//La valeur a été changée, on la remplace directement
+					System.out.println("On change la valeur de "+ TempT.getValue()+ "en"+ TempC.getValue());
 
 					TempT.setValue(TempC.getValue());
 
@@ -209,11 +211,15 @@ public class SudokuManager {
 					if(!(NouvelleListePossible == null)){
 						if(NouvelleListePossible.size() == 1 ){
 							// Plus qu'un élément, on peut mettre une valeur ?
+							System.out.println("On change la valeur" + NouvelleListePossible.get(0));
+
 							setCellValue(Sudoku,i*9+num,NouvelleListePossible.get(0));
 							setCellListePossible(Sudoku,i*9+num,NouvelleListePossible);
 
 						}else {
 							// On change la liste de possibles
+							System.out.println("On change la vliste possible" + NouvelleListePossible);
+
 							setCellListePossible(Sudoku,i*9+num,NouvelleListePossible);
 
 
@@ -236,7 +242,7 @@ public class SudokuManager {
 
 	public void setCarre(int num, ArrayList<Cell> Sudoku,ArrayList<Cell> Cells){
 		ArrayList<Cell> Temp = new ArrayList<Cell>();
-		Temp = getligne(num,Sudoku);
+		Temp = getcarre(num,Sudoku);
 		Integer i = 0;
 		Cell TempC = new Cell();
 		Cell TempT = new Cell();
@@ -247,6 +253,7 @@ public class SudokuManager {
 				if (TempC.getValue() != 0){
 
 					//La valeur a été changée, on la remplace directement
+					System.out.println("On change la valeur de "+ TempT.getValue()+ "en"+ TempC.getValue());
 
 					TempT.setValue(TempC.getValue());
 
@@ -258,12 +265,12 @@ public class SudokuManager {
 					if(!(NouvelleListePossible == null)){
 						if(NouvelleListePossible.size() == 1 ){
 							// Plus qu'un élément, on peut mettre une valeur ?
-							setCellValue(Sudoku,i*9+num,NouvelleListePossible.get(0));
-							setCellListePossible(Sudoku,i*9+num,NouvelleListePossible);
+							setCellValueCarre(Sudoku,num,i,NouvelleListePossible.get(0));
+							setCellListePossibleCarre(Sudoku,num,i,NouvelleListePossible);
 
 						}else {
 							// On change la liste de possibles
-							setCellListePossible(Sudoku,i*9+num,NouvelleListePossible);
+							setCellListePossibleCarre(Sudoku,num,i,NouvelleListePossible);
 
 
 						}
@@ -283,7 +290,7 @@ public class SudokuManager {
 	}
 
 	public void setCellValue(ArrayList<Cell> Sudoku,Integer num, Integer value){
-		System.out.println("setCellValue" + num);
+		System.out.println("setCellValue " + num + "  " +  value);
 
 		Sudoku.get(num).setValue(value);
 
@@ -449,8 +456,166 @@ public class SudokuManager {
 	}
 
 
+	public void setCellListePossibleCarre(ArrayList<Cell> Sudoku,Integer num,Integer i, ArrayList<Integer> value){
+		
+		Integer xd = 0;
+		Integer x = 0;
+		Integer y = 0;
+		Integer yd= 0;
+
+
+
+		switch (num)
+		{
+		case 1:
+			xd=x=y=yd=0;
+			while (x<(xd+3)){
+				y = yd;
+				while (y<(yd+3)){
+					i--;
+					if (i == 0) {
+
+						setCellListePossible(Sudoku,x*9+y, value);
+
+					}
+					y+=1;
+				}
+				x+=1;
+			};
+			break;
+		case 2:
+			xd=x=0;yd=y=3;
+			while (x<(xd+3)){
+				y = yd;
+				while (y<(yd+3)){
+					i--;
+					if (i == 0) {
+
+						setCellListePossible(Sudoku,x*9+y, value);
+
+					}
+					y+=1;
+				}
+				x+=1;
+			};
+			break;
+		case 3:
+			xd=x=0;yd=y=6;
+			while (x<(xd+3)){
+				y = yd;
+				while (y<(yd+3)){
+					i--;
+					if (i == 0) {
+
+						setCellListePossible(Sudoku,x*9+y, value);
+
+					}
+					y+=1;
+				}
+				x+=1;
+			};
+			break;        
+		case 4:
+			xd=x=3;yd=y=0;
+			while (x<(xd+3)){
+				y = yd;
+				while (y<(yd+3)){
+					i--;
+					if (i == 0) {
+
+						setCellListePossible(Sudoku,x*9+y, value);
+
+					}
+					y+=1;
+				}
+				x+=1;
+			};
+			break;
+		case 5:
+			xd=x=3;yd=y=3;
+			while (x<(xd+3)){
+				y = yd;
+				while (y<(yd+3)){
+					i--;
+					if (i == 0) {
+
+						setCellListePossible(Sudoku,x*9+y, value);
+
+					}
+					y+=1;
+				}
+				x+=1;
+			};
+			break;      
+		case 6:
+			xd=x=3;yd=y=6;
+			while (x<(xd+3)){
+				y = yd;
+				while (y<(yd+3)){
+					i--;
+					if (i == 0) {
+
+						setCellListePossible(Sudoku,x*9+y, value);
+
+					}
+					y+=1;
+				}
+				x+=1;
+			};
+			break;
+		case 7:
+			xd=x=6;yd=y=0;
+			while (x<(xd+3)){
+				y = yd;
+				while (y<(yd+3)){
+					i--;
+					if (i == 0) {
+
+						setCellListePossible(Sudoku,x*9+y, value);
+
+					}
+					y+=1;
+				}
+				x+=1;
+			};
+			break;        
+		case 8:
+			xd=x=6;yd=y=3;
+			while (x<(xd+3)){
+				y = yd;
+				while (y<(yd+3)){
+					i--;
+					if (i == 0) {
+
+						setCellListePossible(Sudoku,x*9+y, value);
+
+					}
+					y+=1;
+				}
+				x+=1;
+			};
+			break;
+		case 9:
+			xd=x=6;yd=y=6;
+			while (x<(xd+3)){
+				y = yd;
+				while (y<(yd+3)){
+					i-= 1;
+					if (i == 0) {
+
+						setCellListePossible(Sudoku,x*9+y, value);
+
+					}
+					y+=1;
+				}
+				x+=1;
+			};
+			break;
+		}		
+	}
+
 	public void setCellListePossible(ArrayList<Cell> Sudoku,Integer num, ArrayList<Integer> value){
-		System.out.println("setCellListePossible" + num);
+		System.out.println("setCellListePossible " + num + value);
 
 		Sudoku.get(num).setLPossibles(value);
 
@@ -478,6 +643,20 @@ public class SudokuManager {
 				i+=1;
 			}
 
+		}else{
+			
+
+			while(i < L2Possibles.size()){
+
+				if (L1Possibles.contains(L2Possibles.get(i))){
+
+					LPossiblesResultat.add(L2Possibles.get(i));
+
+				}
+
+				i+=1;
+			}
+
 		}
 		if (!LPossiblesResultat.isEmpty()){
 
@@ -490,7 +669,17 @@ public class SudokuManager {
 	}
 
 	public boolean SudokuIsFinished(ArrayList<Cell> Sudoku){
-		// A FAIRE 
+
+		Integer i = 0;
+		
+		while (i< Sudoku.size()){
+
+			if(Sudoku.get(i).getValue() == 0){
+				return false;
+			}
+			i+=1;
+		}
+		
 		return true;
 	}
 	public void AfficheSudoku(ArrayList<Cell> Sudoku){

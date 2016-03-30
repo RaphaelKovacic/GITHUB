@@ -31,7 +31,7 @@ public class SimulationAgent extends Agent{
 	int id_conv;
 	protected void setup() 
 	{
-		//On récupère le sudoku du fichier
+		//On rï¿½cupï¿½re le sudoku du fichier
 		System.out.println("Agent Simulation. ");
 		SudokuInt = (ArrayList<Integer>) this.getArguments()[0];
 
@@ -41,6 +41,11 @@ public class SimulationAgent extends Agent{
 			Cell element = new Cell(SudokuInt.get(i));
 			Sudoku.add(i, element);
 		}
+		
+		manager.AfficheSudoku(Sudoku);
+
+
+		
 		
 //		int k,j;
 //		k=j=0;
@@ -81,7 +86,7 @@ public class SimulationAgent extends Agent{
 				AID receiver;
 				int num;
 				System.out.println("Agent "+myAgent.getLocalName()+": tick="+getTickCount());
-				// Si on a recu les 27 subrscribe, on parrallélise les traitements.
+				// Si on a recu les 27 subrscribe, on parrallï¿½lise les traitements.
 				System.out.println("nb_subs_recu :"+ nb_subs_recu);
 				if (nb_subs_recu == 27){
 					for (int i = 0 ; i < 27 ; i++){
@@ -101,14 +106,14 @@ public class SimulationAgent extends Agent{
 					}
 					addBehaviour(new TraiteRepAnalyse());
 				}
-				// Sinon il faudrait demander au DF de distribuer les messsages aléatoirement...
+				// Sinon il faudrait demander au DF de distribuer les messsages alï¿½atoirement...
 				else{
 					
 				}
 
 			}
 		});
-		//Behaviour qui s'occupe de réceptionner les 'Subscribe' des agents d'analyses.
+		//Behaviour qui s'occupe de rï¿½ceptionner les 'Subscribe' des agents d'analyses.
 		addBehaviour(new WaitBehaviour());
 		
 
@@ -118,7 +123,7 @@ public class SimulationAgent extends Agent{
 
 		@Override
 		public void action() {
-			// On attend la réception de message de type REQUEST
+			// On attend la rï¿½ception de message de type REQUEST
 			MessageTemplate mt = MessageTemplate.MatchPerformative(ACLMessage.SUBSCRIBE);
 			ACLMessage message = myAgent.receive(mt);
 			if (message != null){
@@ -131,7 +136,7 @@ public class SimulationAgent extends Agent{
 	}
 	
 	class TraiteRepAnalyse extends SimpleBehaviour{
-		//Propriétés
+		//Propriï¿½tï¿½s
 		private boolean endOf;
 		private int nb_rep ;
 		private ArrayList<Cell> cells;
@@ -163,7 +168,7 @@ public class SimulationAgent extends Agent{
 			ACLMessage message = myAgent.receive(mt);
 
 			if (message != null){
-				// On récupère le message et on met à jour notre copie de sudoku.
+				// On rï¿½cupï¿½re le message et on met ï¿½ jour notre copie de sudoku.
 				String mess = message.getContent();
 				// On deserialise le message
 				ObjectMapper mapper = new ObjectMapper();
@@ -183,16 +188,16 @@ public class SimulationAgent extends Agent{
 				
 				nb_rep++;
 				System.out.println("nb_rep :"+ nb_rep);
-				// Si jamais on a reçu les 27 messages :
+				// Si jamais on a reï¿½u les 27 messages :
 				if (nb_rep == 27){
 					nb_rep = 0;
 					endOf = true;
-					// On envoie notre Sudoku "Copy" à Env pour qu'il fasse la Maj du "Vrai" Sudoku.
+					// On envoie notre Sudoku "Copy" ï¿½ Env pour qu'il fasse la Maj du "Vrai" Sudoku.
 					myAgent.addBehaviour(new TraiteMajBehaviour());
 				}
 					
 			}else{
-				// Sinon on attend l'arrivé d'un message
+				// Sinon on attend l'arrivï¿½ d'un message
 				block();		
 			}
 		}

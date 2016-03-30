@@ -132,10 +132,14 @@ public class SudokuManager {
 		Integer i = 0;
 		Cell TempC = new Cell();
 		Cell TempT = new Cell();
+
 		while (i<9){
+
 			TempT = Temp.get(i);
 			TempC = Cells.get(i);
 			if (TempT.getValue() == 0){
+
+				
 				if (TempC.getValue() != 0){
 
 					//La valeur a été changée, on la remplace directement
@@ -147,14 +151,20 @@ public class SudokuManager {
 					//On compare maintenant les listes de possibles
 
 					ArrayList<Integer> NouvelleListePossible = compCell(TempT,TempC);
+					
+
 					if(!(NouvelleListePossible == null)){
+
 						if(NouvelleListePossible.size() == 1 ){
+
 							// Plus qu'un élément, on peut mettre une valeur ?
 							setCellValue(Sudoku,num*9+i,NouvelleListePossible.get(0));
+
 							setCellListePossible(Sudoku,num*9+i,NouvelleListePossible);
 
 
 						}else {
+
 							// On change la liste de possibles
 							setCellListePossible(Sudoku,num*9+i,NouvelleListePossible);
 
@@ -273,6 +283,7 @@ public class SudokuManager {
 	}
 
 	public void setCellValue(ArrayList<Cell> Sudoku,Integer num, Integer value){
+		System.out.println("setCellValue" + num);
 
 		Sudoku.get(num).setValue(value);
 
@@ -280,6 +291,7 @@ public class SudokuManager {
 
 
 	public void setCellValueCarre(ArrayList<Cell> Sudoku,Integer num,Integer i, Integer value){
+		
 		Integer xd = 0;
 		Integer x = 0;
 		Integer y = 0;
@@ -422,7 +434,7 @@ public class SudokuManager {
 			while (x<(xd+3)){
 				y = yd;
 				while (y<(yd+3)){
-					i--;
+					i-= 1;
 					if (i == 0) {
 
 						setCellValue(Sudoku,x*9+y, value);
@@ -438,6 +450,7 @@ public class SudokuManager {
 
 
 	public void setCellListePossible(ArrayList<Cell> Sudoku,Integer num, ArrayList<Integer> value){
+		System.out.println("setCellListePossible" + num);
 
 		Sudoku.get(num).setLPossibles(value);
 
@@ -445,6 +458,7 @@ public class SudokuManager {
 
 
 	public ArrayList<Integer> compCell(Cell Cell1, Cell Cell2){
+
 		ArrayList<Integer> LPossiblesResultat = new ArrayList<Integer>();
 		ArrayList<Integer> L1Possibles = Cell1.getLPossibles();
 		ArrayList<Integer> L2Possibles = Cell2.getLPossibles();
@@ -461,14 +475,16 @@ public class SudokuManager {
 
 				}
 
-
+				i+=1;
 			}
 
 		}
 		if (!LPossiblesResultat.isEmpty()){
+
 			return LPossiblesResultat;
 		}
 		else {
+
 			return null;
 		}
 	}
@@ -487,8 +503,10 @@ public class SudokuManager {
 			}
 
 			System.out.print(Sudoku.get(i).getValue() + "|");
-
+			i+=1;
 		}
+		System.out.println("\n");
+
 	}
 }
 

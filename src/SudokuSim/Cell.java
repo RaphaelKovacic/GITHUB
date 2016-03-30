@@ -47,7 +47,7 @@ public class Cell {
 		while(i < LP.size()){
 
 			this.l_possible.add(LP.get(i));
-
+			i+=1;
 		}
 	}
 }

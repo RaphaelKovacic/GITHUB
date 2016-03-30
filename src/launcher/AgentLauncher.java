@@ -19,7 +19,7 @@ public class AgentLauncher {
 			ContainerController cc = rt.createAgentContainer(p);
 			
 			SudokuManager Manager = new SudokuManager();
-			ArrayList<Integer> sudoku = Manager.ReadSudoku("C:/Users/Benoit/Desktop/GI04/IA04/workspace/TD4_Sudoku/src/sudoku1.txt");
+			ArrayList<Integer> sudoku = Manager.ReadSudoku("src/sudoku1.txt");
 
 			Object args1[] = new Object[1];
 			args1[0] = sudoku;

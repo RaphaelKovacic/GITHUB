@@ -21,18 +21,20 @@ import jade.domain.FIPAAgentManagement.DFAgentDescription;
 import jade.domain.FIPAAgentManagement.ServiceDescription;
 import jade.lang.acl.ACLMessage;
 import jade.lang.acl.MessageTemplate;
+import jade.wrapper.StaleProxyException;
 import jade.core.Agent;
 public class SimulationAgent extends Agent{
 	ArrayList<Integer> SudokuInt = new ArrayList<Integer>();
 	ArrayList<Cell> Sudoku = new ArrayList<Cell>();
 	Cell[][] Sudoku_v2 = new Cell[9][9];
 	SudokuManager manager = new SudokuManager();
+
+	public boolean SudokuFinished;
 	int nb_subs_recu;
 	int id_conv;
 	protected void setup() 
 	{
 		//On rï¿½cupï¿½re le sudoku du fichier
-		System.out.println("Agent Simulation. ");
 		SudokuInt = (ArrayList<Integer>) this.getArguments()[0];
 
 		//On le convertit comme une grille de cells (val +listes des possibles)
@@ -42,22 +44,12 @@ public class SimulationAgent extends Agent{
 			Sudoku.add(i, element);
 		}
 
-		manager.AfficheSudoku(Sudoku);
+		//manager.AfficheSudoku(Sudoku);
 
-//		int k,j;
-//		k=j=0;
-//		for(int i = 0; i < SudokuInt.size(); i++)
-//		{
-//			Cell element = new Cell(SudokuInt.get(i));
-//			j = i%9;
-//			Sudoku_v2[k][j] = element;
-//			if (i != 0 && i%9 == 0)
-//				k++;
-//		}
-
+		SudokuFinished = false;
 		nb_subs_recu = 0;
 		id_conv = 0;
-		
+
 		DFAgentDescription dafd = new DFAgentDescription();
 		dafd.setName(getAID());
 		ServiceDescription sd = new ServiceDescription();
@@ -76,62 +68,126 @@ public class SimulationAgent extends Agent{
 		System.out.println("Agent Simulation. ");
 
 		// Behaviour qui toutes les 10secondes envoies une batterie de messages aux agents analyse
-		addBehaviour(new TickerBehaviour(this, 10000){
+		addBehaviour(new TickerBehaviour(this, 5000){
 			protected void onTick() {
-				String type;
-				String NameOfAna;
-				AID receiver;
-				int num;
-				System.out.println("Agent "+myAgent.getLocalName()+": tick="+getTickCount());
-				// Si on a recu les 27 subrscribe, on parrallï¿½lise les traitements.
-				System.out.println("nb_subs_recu :"+ nb_subs_recu);
-				if (nb_subs_recu == 27){
-					for (int i = 0 ; i < 27 ; i++){
-						NameOfAna = "Analyse"+i;
-						receiver = myAgent.getAID(NameOfAna);
-						num = i%9;
-						if (i <9)
-							type = "Ligne";
-						else 
-							if(i < 18)
-								type = "Colonne";
-							else
-								type = "Carre";
-						nb_subs_recu --;
-						sendMess_ToAna(myAgent,receiver,type,num);
-						id_conv++;
-					}
-					addBehaviour(new TraiteRepAnalyse());
-				}
-				// Sinon il faudrait demander au DF de distribuer les messsages alï¿½atoirement...
-				else{
-					
-				}
+				if (SudokuFinished == false){
 
+					String type;
+					String NameOfAna;
+					AID receiver;
+					int num;
+					System.out.println("Agent "+myAgent.getLocalName()+": tick="+getTickCount());
+					System.out.println("nb_subs_recu :"+ nb_subs_recu);
+					
+					// Si on a recu les 27 subrscribe, on parrallï¿½lise les traitements.
+					if (nb_subs_recu == 27){
+						for (int i = 0 ; i < 27 ; i++){
+							NameOfAna = "Analyse"+i;
+							receiver = myAgent.getAID(NameOfAna);
+							num = i%9;
+							if (i <9)
+								type = "Ligne";
+							else 
+								if(i < 18)
+									type = "Colonne";
+								else
+									type = "Carre";
+							nb_subs_recu --;
+							sendMess_ToAna(myAgent,receiver,type,num);
+							id_conv++;
+						}
+						addBehaviour(new TraiteRepAnalyse());
+					}
+					// Sinon on demande au DF de distribuer les messsages alï¿½atoirement à des agents Analyse...
+					else{
+						for (int i = 0 ; i < 27 ; i++){
+							receiver = getAnaReceiver();
+							num = i%9;
+							if (i <9)
+								type = "Ligne";
+							else 
+								if(i < 18)
+									type = "Colonne";
+								else
+									type = "Carre";
+							if (receiver != null) {
+								sendMess_ToAna(myAgent,receiver,type,num);
+							}else{
+								System.out.println("Aucun agent mult trouve...");
+							}
+							id_conv++;
+						}
+						addBehaviour(new TraiteRepAnalyse());
+						
+
+					}
+				// Sinon si le Sudoku est terminé on Kill la simulation.
+				}else{
+					doDelete();
+				}
 			}
 		});
 		//Behaviour qui s'occupe de rï¿½ceptionner les 'Subscribe' des agents d'analyses.
 		addBehaviour(new WaitBehaviour());
-		
+
+		//Behaviour qui s'occupe de rï¿½ceptionner les 'Inform' de l'agent d Environnemnt.
+		addBehaviour(new WaitEnvBehaviour());
+
 
 	} // fin Setup
+	
+	// Fonction permettant de trouver un agent mult (choisit aléatoirement)
+	public AID getAnaReceiver() {
+		AID rec = null;
+		DFAgentDescription template = new DFAgentDescription();
+		ServiceDescription sd = new ServiceDescription();
+		sd.setType("Sudoku");
+		sd.setName("Analysis");
+		template.addServices(sd);
+		try {
+			DFAgentDescription[] result = DFService.search(this, template);
+			if (result.length > 0){
+				int i;
+				i = (int)(Math.random() * (result.length));
+				rec = result[i].getName();
+			}
+		} catch(FIPAException fe) {
+
+		}
+		return rec;
+	}
 
 	class WaitBehaviour extends CyclicBehaviour{
 
 		@Override
 		public void action() {
-			// On attend la rï¿½ception de message de type REQUEST
+			// On attend la rï¿½ception de message de type Subscribe
 			MessageTemplate mt = MessageTemplate.MatchPerformative(ACLMessage.SUBSCRIBE);
 			ACLMessage message = myAgent.receive(mt);
 			if (message != null){
 				nb_subs_recu++;
-				System.out.println("nb_subs_recu :"+ nb_subs_recu);
 			}else{
 				block();
 			}
 		}
 	}
-	
+
+	class WaitEnvBehaviour extends CyclicBehaviour{
+
+		@Override
+		public void action() {
+			// On attend la rï¿½ception de message de type Inform
+			MessageTemplate mt = MessageTemplate.and(MessageTemplate.MatchPerformative(ACLMessage.INFORM),
+					MessageTemplate.MatchSender(myAgent.getAID("Envi")));
+			ACLMessage message = myAgent.receive(mt);
+			if (message != null){
+				SudokuFinished = true;
+			}else{
+				block();
+			}
+		}
+	}
+
 	class TraiteRepAnalyse extends SimpleBehaviour{
 		//Propriï¿½tï¿½s
 		private boolean endOf;
@@ -139,7 +195,7 @@ public class SimulationAgent extends Agent{
 		private ArrayList<Cell> cells;
 		private String type;
 		private int num;
-		
+
 		//Constructeur
 		public TraiteRepAnalyse() {
 			this.endOf = false;
@@ -178,13 +234,13 @@ public class SimulationAgent extends Agent{
 				catch(Exception ex) {
 					System.out.println("EXCEPTION" + ex.getMessage());
 				}
-				
+
 				// On met a jour notre table "copy";
 				manager.modifySudokuFromCells(type, num, Sudoku, cells);
 
-				
+
 				nb_rep++;
-				System.out.println("nb_rep :"+ nb_rep);
+				//System.out.println("nb_rep :"+ nb_rep);
 				// Si jamais on a reï¿½u les 27 messages :
 				if (nb_rep == 27){
 					nb_rep = 0;
@@ -192,26 +248,26 @@ public class SimulationAgent extends Agent{
 					// On envoie notre Sudoku "Copy" ï¿½ Env pour qu'il fasse la Maj du "Vrai" Sudoku.
 					myAgent.addBehaviour(new TraiteMajBehaviour());
 				}
-					
+
 			}else{
 				// Sinon on attend l'arrivï¿½ d'un message
 				block();		
 			}
 		}
 	}
-	
+
 	class TraiteMajBehaviour extends OneShotBehaviour{
-		
+
 		//Constructeur
 		public TraiteMajBehaviour() {
-			
+
 		}
 
 		public void action() {
 			// envoie du message de Maj.
 			ACLMessage message1 = new ACLMessage(ACLMessage.REQUEST);
 			message1.addReceiver(myAgent.getAID("Envi"));
-			
+
 			ObjectMapper mapper1 = new ObjectMapper();
 			StringWriter sw = new StringWriter();
 
@@ -225,7 +281,7 @@ public class SimulationAgent extends Agent{
 			catch(Exception ex) {
 				System.out.println(ex.getMessage());
 			}
-			
+
 		}
 	}
 
@@ -239,11 +295,11 @@ public class SimulationAgent extends Agent{
 		ArrayList<Cell> CellsToSend = new ArrayList<Cell>();
 		switch(type){
 		case "Ligne": CellsToSend = manager.getligne(num, Sudoku);
-			break;
+		break;
 		case "Colonne": CellsToSend = manager.getcolonne(num, Sudoku);
-			break;
-		case "Carre": CellsToSend = manager.getcarre(num+1, Sudoku);
-			break;
+		break;
+		case "Carre": CellsToSend = manager.getcarre(num, Sudoku);
+		break;
 		}
 		OperationDemand or = new OperationDemand(type,num,CellsToSend);
 		try {
@@ -251,7 +307,7 @@ public class SimulationAgent extends Agent{
 			String s1 = sw.toString();
 			message1.setContent(s1);
 			myAgent.send(message1);
-			System.out.println("Sim a envoye (a "+ receiver.getLocalName() + ") :" + s1);
+			//System.out.println("Sim a envoye (a "+ receiver.getLocalName() + ") :" + s1);
 		}
 		catch(Exception ex) {
 			System.out.println(ex.getMessage());

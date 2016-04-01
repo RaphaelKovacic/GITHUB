@@ -113,23 +113,19 @@ public class AnalysisAgent extends Agent{
 			while (cells_modif == true){
 				cells_modif = false;
 				
-				// Affichage pour debug
-//				for(int i = 0; i < cells.size(); i++)
-//					cells.get(i).print();
-				
 				// Pour chaque cellules...
 				for(int i = 0; i < cells.size(); i++)
 				{
-					// Si la cellule actuelle n'a qu'une valeur possible
+					// Si la cellule actuelle n'a qu'une valeur possible (1)
 					if (cells.get(i).getLPossibles().size() == 1){
 						cells_modif = true;
 						// on met a jour la valeur
 						cells.get(i).setValue(cells.get(i).getLPossibles().get(0));
 						// on vide la liste des possibles
 						cells.get(i).getLPossibles().clear();
-					}
+					} //(1)
 
-					// Si la cellule actuelle a deja une valeur défini
+					// Si la cellule actuelle a deja une valeur défini (2)
 					if (cells.get(i).getValue() != 0){
 
 						//on retire cette valeur des autres listes de possibles.
@@ -137,8 +133,35 @@ public class AnalysisAgent extends Agent{
 							if (cells.get(j).getLPossibles().remove(new Integer(cells.get(i).getValue())) == true)
 								cells_modif = true;
 						}
-					}
+						// on vide la liste des possibles
+						cells.get(i).getLPossibles().clear();
+					} //(2)
+					
+					// Si la cellule actuelle n'a que 2 valeurs possibles (4)
+					if (cells.get(i).getLPossibles().size() == 2){
+						
+						//Pour chaque cellules suivantes.
+						for(int j = i+1; j < cells.size(); j++){
+							if (cells.get(j).getLPossibles().size() == 2){
+								
+								// Si elle contient les 2 même valeurs...
+								if (cells.get(i).getLPossibles().equals(cells.get(j).getLPossibles()) ){
 
+									//on retire ces 2 valeurs des autres listes de possibles.
+									for(int k = 0; k < cells.size(); k++){
+										if (k != i && k != j){
+											if (cells.get(k).getLPossibles().remove(new Integer(cells.get(i).getLPossibles().get(0))) == true)
+												cells_modif = true;	
+											if (cells.get(k).getLPossibles().remove(new Integer(cells.get(i).getLPossibles().get(1))) == true)
+												cells_modif = true;	
+										}
+
+									}
+								}
+							}
+						}
+					} //(4)
+					
 					//On fait ici la liste de toutes les valeurs possibles parmi les 9 cellules
 					for(int j = 0; j < cells.get(i).getLPossibles().size(); j++){
 						if (!LPossiblesTot.contains(cells.get(i).getLPossibles().get(j)))
@@ -146,7 +169,7 @@ public class AnalysisAgent extends Agent{
 					}
 				}
 
-				// Pour chaque valeurs possibles
+				// Pour chaque valeurs possibles (3)
 				for(int i = 0; i < LPossiblesTot.size(); i++){
 					int occur_VP = 0;
 					int indice_cell = -1;
@@ -163,9 +186,10 @@ public class AnalysisAgent extends Agent{
 					if (occur_VP == 1){
 						// on met a jour la valeur de la cellule contenant une seule fois la valeur possible
 						cells.get(indice_cell).setValue(LPossiblesTot.get(i));
+						cells_modif = true;
 					}
 
-				}
+				} //(3)
 			}
 
 			// On renvoie un message de type INFORM serialise avec le resultat

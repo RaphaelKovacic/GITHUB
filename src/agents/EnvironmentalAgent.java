@@ -1,6 +1,7 @@
 package agents;
 
 
+import java.io.StringWriter;
 import java.util.ArrayList;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -26,7 +27,6 @@ public class EnvironmentalAgent extends Agent{
 	protected void setup() 
 	{ 
 		//On récupère le sudoku du fichier
-		System.out.println("Agent Simulation. ");
 		SudokuInt = (ArrayList<Integer>) this.getArguments()[0];
 
 		//On le convertit comme une grille de cells (val +listes des possibles)
@@ -49,9 +49,7 @@ public class EnvironmentalAgent extends Agent{
 			fe.printStackTrace();
 		}
 
-
-		System.out.println("Agent Environmental. ");
-		System.out.println("My name is "+ this.getLocalName()); 	          
+		System.out.println("Agent Environmental. ");	          
 		addBehaviour(new WaitBehaviour());
 
 	}
@@ -99,11 +97,32 @@ public class EnvironmentalAgent extends Agent{
 			// On met a jour le Sudoku.
 			Sudoku = SudokuSimul;
 			
+			// Juste pour debug
+			manager.AfficheSudoku(Sudoku);
+			
 			// Si le Sudoku est terminé
 			if (manager.SudokuIsFinished(Sudoku)){
 				// On affiche le résultat
+				System.out.println("Voici le resultat du Sudoku : ");
 				manager.AfficheSudoku(Sudoku);
+				
+				// On envoie un message a 'Simulation' pour le prévenir que le Sudoku est fini.
+				ACLMessage message1 = new ACLMessage(ACLMessage.INFORM);
+				message1.addReceiver(myAgent.getAID("Simu"));
+				
+				ObjectMapper mapper1 = new ObjectMapper();
+				StringWriter sw = new StringWriter();
 
+				OperationResult or = new OperationResult(Sudoku);
+				try {
+					mapper1.writeValue(sw, or);
+					String s1 = sw.toString();
+					message1.setContent(s1);
+					myAgent.send(message1);
+				}
+				catch(Exception ex) {
+					System.out.println(ex.getMessage());
+				}
 			}
 		}
 

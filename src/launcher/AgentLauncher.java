@@ -19,21 +19,19 @@ public class AgentLauncher {
 			ContainerController cc = rt.createAgentContainer(p);
 			
 			SudokuManager Manager = new SudokuManager();
-			ArrayList<Integer> sudoku = Manager.ReadSudoku("src/sudoku1.txt");
+			ArrayList<Integer> sudoku = Manager.ReadSudoku("src/sudoku4.txt");
 			
 			Object args1[] = new Object[1];
 			args1[0] = sudoku;
 		
+			AgentController ac = cc.createNewAgent("Simu","agents.SimulationAgent", args1);
+			ac.start();
+			
 			Integer i = 0;
 			while(i<27){
 				(cc.createNewAgent("Analyse"+i,"agents.AnalysisAgent", null)).start();
 				i+=1;
 			}
-			
-			AgentController ac = cc.createNewAgent("Simu","agents.SimulationAgent", args1);
-			ac.start();
-			System.out.println(ac.getState());
-
 
 			AgentController ac1 = cc.createNewAgent("Envi",
 					"agents.EnvironmentalAgent", args1);

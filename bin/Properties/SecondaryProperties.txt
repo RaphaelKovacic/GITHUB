@@ -1,5 +1,9 @@
 main=false
 gui=false
 container-name = tdtp
+<<<<<<< HEAD
 host = 192.168.1.77
+=======
+host = 192.168.1.51
+>>>>>>> 7da42b1925b12b2472f4449364bb67f854fbe72d
 #local-port=1099

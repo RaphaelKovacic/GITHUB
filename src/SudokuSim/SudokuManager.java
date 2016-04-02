@@ -1,5 +1,11 @@
 package SudokuSim;
 
+import jade.core.AID;
+import jade.domain.DFService;
+import jade.domain.FIPAException;
+import jade.domain.FIPAAgentManagement.DFAgentDescription;
+import jade.domain.FIPAAgentManagement.ServiceDescription;
+
 import java.io.BufferedReader;
 import java.io.FileNotFoundException;
 import java.io.FileReader;

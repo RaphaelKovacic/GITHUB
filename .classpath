@@ -2,9 +2,9 @@
 <classpath>
 	<classpathentry kind="src" path="src"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.7"/>
-	<classpathentry kind="lib" path="C:/Users/Benoit/Desktop/GI04/IA04/Librairies_utiles/jackson-annotations-2.6.4.jar"/>
-	<classpathentry kind="lib" path="C:/Users/Benoit/Desktop/GI04/IA04/Librairies_utiles/jackson-core-2.6.4.jar"/>
-	<classpathentry kind="lib" path="C:/Users/Benoit/Desktop/GI04/IA04/Librairies_utiles/jackson-databind-2.6.4.jar"/>
-	<classpathentry kind="lib" path="C:/Users/Benoit/Desktop/GI04/IA04/Librairies_utiles/jade4.3.3.jar"/>
+	<classpathentry kind="lib" path="/media/raphael/DISQUEDUR/gitIA04/depend/lib-json/jackson-annotations-2.6.4.jar"/>
+	<classpathentry kind="lib" path="/media/raphael/DISQUEDUR/gitIA04/depend/lib-json/jackson-core-2.6.4.jar"/>
+	<classpathentry kind="lib" path="/media/raphael/DISQUEDUR/gitIA04/depend/lib-json/jackson-databind-2.6.4.jar"/>
+	<classpathentry kind="lib" path="/media/raphael/DISQUEDUR/gitIA04/depend/jade4.3.3.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

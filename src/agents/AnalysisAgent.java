@@ -7,6 +7,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import Class_For_JSON.OperationDemand;
 import SudokuSim.Cell;
+import jade.core.AID;
 import jade.core.Agent;
 import jade.core.behaviours.CyclicBehaviour;
 import jade.core.behaviours.OneShotBehaviour;
@@ -45,15 +46,22 @@ public class AnalysisAgent extends Agent{
 
 	class SubBehaviour extends OneShotBehaviour{
 		public void action(){
-			// Si l'agent n'est pas occupé il faut envoyé un message Subscribe à l'agent de Simu
+			// Si l'agent n'est pas occupï¿½ il faut envoyï¿½ un message Subscribe ï¿½ l'agent de Simu
 			if(isOccuped == false){
 				ACLMessage message1 = new ACLMessage(ACLMessage.SUBSCRIBE);
-				message1.addReceiver(myAgent.getAID("Simu"));
-				message1.setContent("Je suis prêt à travailler");
+				//message1.addReceiver(myAgent.getAID("Simu"));
+				AID receiver = getReceiver("Sudoku", "SimulationAgent");
+				if (receiver != null) {
+				message1.addReceiver(receiver);
+				message1.setContent("Je suis prï¿½t ï¿½ travailler");
 				myAgent.send(message1);
-				
-				// L'agent passe en occupé;
+
+				// L'agent passe en occupï¿½;
 				isOccuped = true;
+				}else{
+					System.out.println(
+							getLocalName() + "--> No receiver");
+				}
 			}
 		}
 	}
@@ -65,11 +73,11 @@ public class AnalysisAgent extends Agent{
 		@Override
 		public void action() {
 
-			// On attend la réception de message de type REQUEST
+			// On attend la rï¿½ception de message de type REQUEST
 			MessageTemplate mt = MessageTemplate.MatchPerformative(ACLMessage.REQUEST);
 			ACLMessage message = myAgent.receive(mt);
 			if (message != null){
-				// A la reception, on lance un OneShotBehaviour qui s'occupe de traiter le message et de répondre
+				// A la reception, on lance un OneShotBehaviour qui s'occupe de traiter le message et de rï¿½pondre
 				myAgent.addBehaviour(new TraiteCellsBehaviour(message));
 			}else{
 				block();
@@ -107,12 +115,12 @@ public class AnalysisAgent extends Agent{
 			catch(Exception ex) {
 				System.out.println("EXCEPTION" + ex.getMessage());
 			}
-			// On execute les différents algo... (modifie cells en conséquence)
+			// On execute les diffï¿½rents algo... (modifie cells en consï¿½quence)
 			ArrayList<Integer> LPossiblesTot = new ArrayList<Integer>();
 			boolean cells_modif = true;
 			while (cells_modif == true){
 				cells_modif = false;
-				
+
 				// Pour chaque cellules...
 				for(int i = 0; i < cells.size(); i++)
 				{
@@ -125,7 +133,7 @@ public class AnalysisAgent extends Agent{
 						cells.get(i).getLPossibles().clear();
 					} //(1)
 
-					// Si la cellule actuelle a deja une valeur défini (2)
+					// Si la cellule actuelle a deja une valeur dï¿½fini (2)
 					if (cells.get(i).getValue() != 0){
 
 						//on retire cette valeur des autres listes de possibles.
@@ -136,15 +144,15 @@ public class AnalysisAgent extends Agent{
 						// on vide la liste des possibles
 						cells.get(i).getLPossibles().clear();
 					} //(2)
-					
+
 					// Si la cellule actuelle n'a que 2 valeurs possibles (4)
 					if (cells.get(i).getLPossibles().size() == 2){
-						
+
 						//Pour chaque cellules suivantes.
 						for(int j = i+1; j < cells.size(); j++){
 							if (cells.get(j).getLPossibles().size() == 2){
-								
-								// Si elle contient les 2 même valeurs...
+
+								// Si elle contient les 2 mï¿½me valeurs...
 								if (cells.get(i).getLPossibles().equals(cells.get(j).getLPossibles()) ){
 
 									//on retire ces 2 valeurs des autres listes de possibles.
@@ -161,7 +169,7 @@ public class AnalysisAgent extends Agent{
 							}
 						}
 					} //(4)
-					
+
 					//On fait ici la liste de toutes les valeurs possibles parmi les 9 cellules
 					for(int j = 0; j < cells.get(i).getLPossibles().size(); j++){
 						if (!LPossiblesTot.contains(cells.get(i).getLPossibles().get(j)))
@@ -182,7 +190,7 @@ public class AnalysisAgent extends Agent{
 							indice_cell = j;
 						}
 					}
-					// Si on a trouvée qu'une seule fois la valeur possible parmis toutes les ListePossible
+					// Si on a trouvï¿½e qu'une seule fois la valeur possible parmis toutes les ListePossible
 					if (occur_VP == 1){
 						// on met a jour la valeur de la cellule contenant une seule fois la valeur possible
 						cells.get(indice_cell).setValue(LPossiblesTot.get(i));
@@ -206,11 +214,30 @@ public class AnalysisAgent extends Agent{
 				myAgent.send(reply);
 			}
 			catch(Exception ex) {}
-			
+
 			// L'agent a fini son job;
 			isOccuped = false;
 			addBehaviour(new SubBehaviour());
 		}
+	}
+	private AID getReceiver(String S1, String S2) {
+		AID rec = null;
+		DFAgentDescription template =
+				new DFAgentDescription();
+		ServiceDescription sd = new ServiceDescription();
+		sd.setType(S1);
+		sd.setName(S2);
+		template.addServices(sd);
+		try {
+			DFAgentDescription[] result =
+					DFService.search(this, template);
+			if (result.length > 0)
+				rec = result[0].getName();
+		} catch(FIPAException fe) {
+
+			System.out.println(fe.getMessage());
+		}
+		return rec;
 	}
 
 }

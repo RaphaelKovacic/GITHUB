@@ -18,6 +18,7 @@ import jade.domain.FIPAAgentManagement.DFAgentDescription;
 import jade.domain.FIPAAgentManagement.ServiceDescription;
 import jade.lang.acl.ACLMessage;
 import jade.lang.acl.MessageTemplate;
+import jade.core.AID;
 import jade.core.Agent;
 
 public class EnvironmentalAgent extends Agent{
@@ -26,7 +27,7 @@ public class EnvironmentalAgent extends Agent{
 	SudokuManager manager = new SudokuManager();
 	protected void setup() 
 	{ 
-		//On récupère le sudoku du fichier
+		//On rï¿½cupï¿½re le sudoku du fichier
 		SudokuInt = (ArrayList<Integer>) this.getArguments()[0];
 
 		//On le convertit comme une grille de cells (val +listes des possibles)
@@ -58,11 +59,11 @@ public class EnvironmentalAgent extends Agent{
 
 		@Override
 		public void action() {
-			// On attend la réception de message de type REQUEST
+			// On attend la rï¿½ception de message de type REQUEST
 			MessageTemplate mt = MessageTemplate.MatchPerformative(ACLMessage.REQUEST);
 			ACLMessage message = myAgent.receive(mt);
 			if (message != null){
-				// A la reception, on lance un OneShotBehaviour qui s'occupe de traiter le message et de répondre
+				// A la reception, on lance un OneShotBehaviour qui s'occupe de traiter le message et de rï¿½pondre
 				myAgent.addBehaviour(new MajBehaviour(message));
 			}else{
 				block();
@@ -93,38 +94,64 @@ public class EnvironmentalAgent extends Agent{
 			catch(Exception ex) {
 				System.out.println("EXCEPTION" + ex.getMessage());
 			}
-			
+
 			// On met a jour le Sudoku.
 			Sudoku = SudokuSimul;
-			
+
 			// Juste pour debug
 			manager.AfficheSudoku(Sudoku);
-			
-			// Si le Sudoku est terminé
+
+			// Si le Sudoku est terminï¿½
 			if (manager.SudokuIsFinished(Sudoku)){
-				// On affiche le résultat
+				// On affiche le rï¿½sultat
 				System.out.println("Voici le resultat du Sudoku : ");
 				manager.AfficheSudoku(Sudoku);
-				
-				// On envoie un message a 'Simulation' pour le prévenir que le Sudoku est fini.
-				ACLMessage message1 = new ACLMessage(ACLMessage.INFORM);
-				message1.addReceiver(myAgent.getAID("Simu"));
-				
-				ObjectMapper mapper1 = new ObjectMapper();
-				StringWriter sw = new StringWriter();
 
-				OperationResult or = new OperationResult(Sudoku);
-				try {
-					mapper1.writeValue(sw, or);
-					String s1 = sw.toString();
-					message1.setContent(s1);
-					myAgent.send(message1);
-				}
-				catch(Exception ex) {
-					System.out.println(ex.getMessage());
+				// On envoie un message a 'Simulation' pour le prï¿½venir que le Sudoku est fini.
+				ACLMessage message1 = new ACLMessage(ACLMessage.INFORM);
+				//message1.addReceiver(myAgent.getAID("Simu"));
+				AID receiver = getReceiver("Sudoku", "SimulationAgent");
+				if (receiver != null) {
+					message1.addReceiver(receiver);
+					ObjectMapper mapper1 = new ObjectMapper();
+					StringWriter sw = new StringWriter();
+
+					OperationResult or = new OperationResult(Sudoku);
+					try {
+						mapper1.writeValue(sw, or);
+						String s1 = sw.toString();
+						message1.setContent(s1);
+						myAgent.send(message1);
+					}
+					catch(Exception ex) {
+						System.out.println(ex.getMessage());
+					}
+				}else{
+					System.out.println(
+							getLocalName() + "--> No receiver");
 				}
 			}
 		}
 
+	}
+
+	private AID getReceiver(String S1, String S2) {
+		AID rec = null;
+		DFAgentDescription template =
+				new DFAgentDescription();
+		ServiceDescription sd = new ServiceDescription();
+		sd.setType(S1);
+		sd.setName(S2);
+		template.addServices(sd);
+		try {
+			DFAgentDescription[] result =
+					DFService.search(this, template);
+			if (result.length > 0)
+				rec = result[0].getName();
+		} catch(FIPAException fe) {
+
+			System.out.println(fe.getMessage());
+		}
+		return rec;
 	}
 }

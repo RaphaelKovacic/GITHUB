@@ -78,7 +78,7 @@ public class SimulationAgent extends Agent{
 					int num;
 					System.out.println("Agent "+myAgent.getLocalName()+": tick="+getTickCount());
 					System.out.println("nb_subs_recu :"+ nb_subs_recu);
-					
+
 					// Si on a recu les 27 subrscribe, on parrallï¿½lise les traitements.
 					if (nb_subs_recu == 27){
 						for (int i = 0 ; i < 27 ; i++){
@@ -98,7 +98,7 @@ public class SimulationAgent extends Agent{
 						}
 						addBehaviour(new TraiteRepAnalyse());
 					}
-					// Sinon on demande au DF de distribuer les messsages alï¿½atoirement à des agents Analyse...
+					// Sinon on demande au DF de distribuer les messsages alï¿½atoirement ï¿½ des agents Analyse...
 					else{
 						for (int i = 0 ; i < 27 ; i++){
 							receiver = getAnaReceiver();
@@ -118,10 +118,10 @@ public class SimulationAgent extends Agent{
 							id_conv++;
 						}
 						addBehaviour(new TraiteRepAnalyse());
-						
+
 
 					}
-				// Sinon si le Sudoku est terminé on Kill la simulation.
+					// Sinon si le Sudoku est terminï¿½ on Kill la simulation.
 				}else{
 					doDelete();
 				}
@@ -135,8 +135,8 @@ public class SimulationAgent extends Agent{
 
 
 	} // fin Setup
-	
-	// Fonction permettant de trouver un agent mult (choisit aléatoirement)
+
+	// Fonction permettant de trouver un agent mult (choisit alï¿½atoirement)
 	public AID getAnaReceiver() {
 		AID rec = null;
 		DFAgentDescription template = new DFAgentDescription();
@@ -266,22 +266,28 @@ public class SimulationAgent extends Agent{
 		public void action() {
 			// envoie du message de Maj.
 			ACLMessage message1 = new ACLMessage(ACLMessage.REQUEST);
-			message1.addReceiver(myAgent.getAID("Envi"));
+			//			message1.addReceiver(myAgent.getAID("Envi"));
 
-			ObjectMapper mapper1 = new ObjectMapper();
-			StringWriter sw = new StringWriter();
+			AID receiver = getReceiver("Sudoku", "EnvironmentalAgent");
+			if (receiver != null) {
+				message1.addReceiver(receiver);
+				ObjectMapper mapper1 = new ObjectMapper();
+				StringWriter sw = new StringWriter();
 
-			OperationResult or = new OperationResult(Sudoku);
-			try {
-				mapper1.writeValue(sw, or);
-				String s1 = sw.toString();
-				message1.setContent(s1);
-				myAgent.send(message1);
+				OperationResult or = new OperationResult(Sudoku);
+				try {
+					mapper1.writeValue(sw, or);
+					String s1 = sw.toString();
+					message1.setContent(s1);
+					myAgent.send(message1);
+				}
+				catch(Exception ex) {
+					System.out.println(ex.getMessage());
+				}
+			}else{
+				System.out.println(
+						getLocalName() + "--> No receiver");
 			}
-			catch(Exception ex) {
-				System.out.println(ex.getMessage());
-			}
-
 		}
 	}
 
@@ -312,5 +318,25 @@ public class SimulationAgent extends Agent{
 		catch(Exception ex) {
 			System.out.println(ex.getMessage());
 		}
+	}
+
+	private AID getReceiver(String S1, String S2) {
+		AID rec = null;
+		DFAgentDescription template =
+				new DFAgentDescription();
+		ServiceDescription sd = new ServiceDescription();
+		sd.setType(S1);
+		sd.setName(S2);
+		template.addServices(sd);
+		try {
+			DFAgentDescription[] result =
+					DFService.search(this, template);
+			if (result.length > 0)
+				rec = result[0].getName();
+		} catch(FIPAException fe) {
+
+			System.out.println(fe.getMessage());
+		}
+		return rec;
 	}
 }

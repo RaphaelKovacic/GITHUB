@@ -4,6 +4,11 @@ package agents;
 import java.io.StringWriter;
 import java.util.ArrayList;
 
+import sim.display.Console;
+import sim.display.GUIState;
+import sim.engine.SimState;
+import sim.field.grid.ObjectGrid2D;
+
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import Class_For_JSON.OperationResult;
@@ -154,4 +159,5 @@ public class EnvironmentalAgent extends Agent{
 		}
 		return rec;
 	}
+	
 }

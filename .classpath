@@ -6,5 +6,12 @@
 	<classpathentry kind="lib" path="/media/raphael/DISQUEDUR/gitIA04/depend/lib-json/jackson-core-2.6.4.jar"/>
 	<classpathentry kind="lib" path="/media/raphael/DISQUEDUR/gitIA04/depend/lib-json/jackson-databind-2.6.4.jar"/>
 	<classpathentry kind="lib" path="/media/raphael/DISQUEDUR/gitIA04/depend/jade4.3.3.jar"/>
+	<classpathentry kind="lib" path="/media/raphael/DISQUEDUR/gitIA04/depend/mason18/bsh-2.0b4.jar"/>
+	<classpathentry kind="lib" path="/media/raphael/DISQUEDUR/gitIA04/depend/mason18/itext-1.2.jar"/>
+	<classpathentry kind="lib" path="/media/raphael/DISQUEDUR/gitIA04/depend/mason18/jcommon-1.0.21.jar"/>
+	<classpathentry kind="lib" path="/media/raphael/DISQUEDUR/gitIA04/depend/mason18/jfreechart-1.0.17.jar"/>
+	<classpathentry kind="lib" path="/media/raphael/DISQUEDUR/gitIA04/depend/mason18/jmf.jar"/>
+	<classpathentry kind="lib" path="/media/raphael/DISQUEDUR/gitIA04/depend/mason18/mason.18.jar"/>
+	<classpathentry kind="lib" path="/media/raphael/DISQUEDUR/gitIA04/depend/mason18/portfolio.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

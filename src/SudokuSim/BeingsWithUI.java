@@ -15,21 +15,27 @@ import sim.display.Controller;
 import sim.display.Display2D;
 import sim.display.GUIState;
 import sim.engine.SimState;
+import sim.field.grid.IntGrid2D;
+import sim.portrayal.FieldPortrayal2D;
 import sim.portrayal.Inspector;
+import sim.portrayal.Portrayal2D;
+import sim.portrayal.grid.FastValueGridPortrayal2D;
+import sim.portrayal.grid.HexaValueGridPortrayal2D;
 import sim.portrayal.grid.ObjectGridPortrayal2D;
+import sim.portrayal.grid.ValueGridPortrayal2D;
 import sim.portrayal.simple.OvalPortrayal2D;
 
 public class BeingsWithUI extends GUIState {
 	public static int FRAME_SIZE = 600;
 	public Display2D display;
 	public JFrame displayFrame;
-	ObjectGridPortrayal2D yardPortrayal = new ObjectGridPortrayal2D();
+	ValueGridPortrayal2D yardPortrayal = new ValueGridPortrayal2D();
 	
 	public BeingsWithUI(SimState state) {
 		super(state);
 	}
 	public static String getName() {
-		return "Simulation de créatures"; 
+		return "Simulation résolution de SUDOKU"; 
 	}
 	public void start() {
 	  super.start();
@@ -42,16 +48,19 @@ public class BeingsWithUI extends GUIState {
 	}
 	public void setupPortrayals() {
 	  Beings beings = (Beings) state;	
-	  yardPortrayal.setField(beings.yard );
-	  yardPortrayal.setPortrayalForClass(TypeA.class, getTypeAPortrayal());
-	  yardPortrayal.setPortrayalForClass(TypeB.class, getTypeBPortrayal());
+	  yardPortrayal.setField(beings.yard);
+	  //yardPortrayal.setPortrayalForClass(TypeA.class, getTypeAPortrayal());
+	  //yardPortrayal.setPortrayalForClass(TypeB.class, getTypeBPortrayal());
 	  //yardPortrayal.setPortrayalForClass(TypeB.class, new StrangeOvalPortrayal());
+	 // yardPortrayal.setPortrayalForObject(0, getTypeAPortrayal());
+	  //yardPortrayal.setPortrayalForNonNull(getTypeBPortrayal());
 	  display.reset();
 	  display.setBackdrop(Color.orange);
 		// redraw the display
 	  //addBackgroundImage();
 	  display.repaint();
 	}
+	
 	private OvalPortrayal2D getTypeAPortrayal() {
 		OvalPortrayal2D r = new OvalPortrayal2D();
 		r.paint = Color.RED;
@@ -69,7 +78,7 @@ public class BeingsWithUI extends GUIState {
 		  display = new Display2D(FRAME_SIZE,FRAME_SIZE,this);
 		  display.setClipping(false);
 		  displayFrame = display.createFrame();
-		  displayFrame.setTitle("Beings");
+		  displayFrame.setTitle("Sudoku");
 		  c.registerFrame(displayFrame); // so the frame appears in the "Display" list
 		  displayFrame.setVisible(true);
 		  display.attach( yardPortrayal, "Yard" );
